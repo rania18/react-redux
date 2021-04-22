@@ -1,39 +1,60 @@
-import { ADD_TODO, UPDATE_TODO, DELETE_TODO,DONE_TODO } from './typeAction';
-import { todos } from './states';
+import {
+  ADD_TODO,
+  DELATE_TODO,
+  UPDATE_TODO,
+  DONE_TODO,
+  FILTER_TODO,
+} from "./Action";
 
-export let reducer = (state = todos, action)=>{
-    let newTodos;
-    switch (action.type) {
-        case ADD_TODO:
-            newTodos = [...state];
-            newTodos.push(action.payload);
-            return newTodos;
-        case DELETE_TODO:
-            newTodos = [...state];
-            newTodos = newTodos.filter(todo => todo.id != action.payload);
-            return newTodos;
-        case DONE_TODO:
-            return state.map(el=>{
-                if (el.id===action.payload){
-                el.done=!el.done
-                }
-                return el
-            })            
-        case UPDATE_TODO:
-            newTodos = [...state];
-            let index = -1;
-            for (let i = 0; i < newTodos.length; i++) {
-                index++;
-                if (newTodos[i].id == action.payload.id) {
-                    break;
-                }
+import { initState } from "./State";
 
-            }
-            if (index != -1) {
-                newTodos[index] = action.payload;
-                return newTodos;
-            }
+export const reducer = (state = initState, action) => {
+  let newTodos;
+  switch (action.type) {
+    case ADD_TODO:
+      newTodos = [...state.todos];
+      newTodos.push(action.payload);
+      return {...state,todos:newTodos};
+    case DONE_TODO:
+      return {...state,todos:state.todos.map((el) => {
+        if (el.id === action.payload) {
+          el.done = !el.done;
+        }
+        return el;
+      })
+      };
 
-    }
-    return state;
-}
+    case DELATE_TODO:
+      newTodos = [...state.todos];
+      newTodos = newTodos.filter((todo) => todo.id !== action.payload);
+      return  {...state,todos:newTodos};
+    case UPDATE_TODO:
+      newTodos = [...state.todos];
+      return {...state,todos:state.todos.map((el) => {
+        if (el.id === action.payload.id) {
+          return action.payload
+        }
+        return el;
+      })
+      };
+
+      // let index = -1;
+      // for (let i = 0; i < newTodos.length; i++) {
+      //   index++;
+      //   if (newTodos[i].id === action.payload.id) {
+      //     break;
+      //   }
+      // }
+      // if (index !== -1) {
+      //   newTodos[index] = action.payload;
+      //   return newTodos;
+      // }
+    case FILTER_TODO:
+      return {
+        ...state,
+        filter: action.payload,
+      };
+  }
+
+  return state;
+};
